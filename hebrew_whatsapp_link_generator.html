@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>יוצר הודעות אוטומטיות לווצאפ</title>
+<style>
+body {
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+textarea, button {
+    margin: 10px auto;
+    padding: 12px;
+    width: 90%;
+    max-width: 500px;
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+textarea {
+    resize: vertical;
+    min-height: 50px;
+}
+button {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #45a049;
+}
+#linksContainer a {
+    background-color: #008CBA;
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+#linksContainer a:hover {
+    background-color: #007bb8;
+}
+</style>
+</head>
+<body>
+<h1>יוצר הודעות אוטומטיות לווצאפ</h1>
+
+<textarea id="messageInput" placeholder="הכנס את הודעתך כאן"></textarea>
+<textarea id="numberInput" placeholder="הכנס מספרי טלפון (מופרדים ברווח, פסיק או שורה חדשה)"></textarea>
+<button onclick="generateLinks()">צור קישורים</button>
+
+<div id="linksContainer"></div>
+
+<script>
+var currentLinkIndex = 0;
+var whatsappLinks = [];
+
+function generateLinks() {
+    currentLinkIndex = 0;
+    var message = document.getElementById('messageInput').value;
+    var numbers = document.getElementById('numberInput').value.split(/[\s,]+/);
+    var linksContainer = document.getElementById('linksContainer');
+    linksContainer.innerHTML = '';
+    whatsappLinks = [];
+
+    numbers.forEach(function(number) {
+        number = number.trim();
+        if(number) {
+            var formattedNumber = '972' + number.substring(1); // Convert to international format
+            var link = 'https://wa.me/' + formattedNumber + '?text=' + encodeURIComponent(message);
+            whatsappLinks.push(link);
+        }
+    });
+
+    if(whatsappLinks.length > 0) {
+        updateLink();
+    }
+}
+
+function updateLink() {
+    var linksContainer = document.getElementById('linksContainer');
+    if (currentLinkIndex < whatsappLinks.length) {
+        var linkElement = document.createElement('a');
+        linkElement.href = whatsappLinks[currentLinkIndex];
+        linkElement.target = '_blank';
+        linkElement.textContent = 'לחץ כאן להודעת ווצאפ הבאה (' + (currentLinkIndex + 1) + '/' + whatsappLinks.length + ')';
+        linkElement.onclick = function() {
+            currentLinkIndex++;
+            updateLink();
+        };
+        linksContainer.innerHTML = '';
+        linksContainer.appendChild(linkElement);
+    } else {
+        linksContainer.innerHTML = 'כל הקישורים נבדקו';
+    }
+}
+</script>
+<p>נוצר על ידי אפק בניאס</p>
+</body>
+</html>

@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>יוצר הודעות אוטומטיות לווצאפ</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="WhatsApp Link Generator">
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+    <!-- Existing CSS and other head elements -->
+    <!-- ... -->
+    <script>
+    window.onload = function() {
+        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+        // iPhone detection
+        if (/iPhone/i.test(userAgent)) {
+            var message = "";
+
+            if (/Safari/i.test(userAgent) && !/CriOS/i.test(userAgent)) {
+                // iPhone using Safari
+                message = "כדי לשמור את האפליקציה על מסך הבית, יש ללחוץ על הסמל למטה ולאחר מכן ללחוץ על 'שמור על המסך הבית'";
+            } else {
+                // iPhone using a different browser
+                message = "כדי לשמור את האתר כאפליקציה על מסך הבית, עליך לעבור לגלישה באתר מדפדפן הספארי ולהוסיף אותו למסך הבית";
+            }
+
+            alert(message);
+        }
+    };
+    </script>
+</head>
+<body>
+    <!-- Your existing HTML body content -->
+    <!-- ... -->
+</body>
+</html>

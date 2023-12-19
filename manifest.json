@@ -1,21 +1,20 @@
 {
   "name": "WhatsApp Link Generator",
   "short_name": "WhatsAppGen",
-  "start_url": "./Untitled-1.html",
+  "start_url": "/afek/Untitled-1.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "description": "A tool to generate WhatsApp message links",
   "icons": [
     {
-      "src": "icons/icon-192x192.jpg",
+      "src": "/afek/icons/icon-192x192.jpg",
       "sizes": "192x192",
       "type": "image/jpg"
     },
     {
-      "src": "icons/icon-512x512.png",
+      "src": "/afek/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ]
 }
-

@@ -1,7 +1,7 @@
 {
   "name": "WhatsApp Link Generator",
   "short_name": "WhatsAppGen",
-  "start_url": "./index.html",
+  "start_url": "./Untitled-1.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "description": "A tool to generate WhatsApp message links",

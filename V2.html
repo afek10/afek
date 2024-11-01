@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>יוצר הודעות אוטומטיות לווצאפ</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,123 +10,252 @@
     <meta name="apple-mobile-web-app-title" content="WhatsApp Link Generator">
     <link rel="apple-touch-icon" href="icons/icon-152x152.jpg">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" defer></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" defer></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             text-align: center;
+            padding: 10px;
+            background: linear-gradient(to bottom, #ffffff, #d9e2ec);
+            direction: rtl;
+            color: #333;
+            overflow-x: hidden;
+        }
+        .card {
+            margin: 10px auto;
             padding: 20px;
-            background-color: #f4f4f4;
+            max-width: 100%;
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: right;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #007bff;
+            font-weight: bold;
+        }
+        p {
+            font-size: 1em;
+            margin-bottom: 15px;
         }
         textarea, button {
             margin: 10px auto;
             padding: 12px;
-            width: 90%;
-            max-width: 500px;
-            border: none;
-            border-radius: 4px;
+            width: 100%;
+            max-width: 100%;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         textarea {
             resize: vertical;
-            min-height: 50px;
+            min-height: 100px;
+            text-align: right;
+            font-size: 1em;
         }
         button {
-            background-color: #4CAF50;
+            background-color: #28a745;
             color: white;
-            font-size: 16px;
+            font-size: 1.2em;
             cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #218838;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
         #linksContainer a {
-            background-color: #008CBA;
+            background-color: #007bff;
             color: white;
             text-decoration: none;
             padding: 10px 15px;
-            border-radius: 4px;
+            border-radius: 8px;
             display: inline-block;
             margin: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.3s;
         }
         #linksContainer a:hover {
-            background-color: #007bb8;
+            background-color: #0056b3;
+            transform: translateY(-3px);
+        }
+        #notification {
+            margin-top: 15px;
+            color: #d9534f;
+            font-weight: bold;
+        }
+        .spinner-border {
+            display: none;
+            margin: 15px auto;
+        }
+        label {
+            float: right;
+            font-size: 1em;
+            font-weight: bold;
+            color: #495057;
+        }
+        #helpButton {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        #helpButton:hover {
+            background-color: #e64a19;
+            transform: scale(1.1);
         }
     </style>
     <script>
-        var currentLinkIndex = 0;
-        var whatsappLinks = [];
+        let currentLinkIndex = 0;
+        let whatsappLinks = [];
+        let linkElement = null;
 
-        function generateLinks() {
+        function saveState() {
+            localStorage.setItem('currentLinkIndex', currentLinkIndex);
+            localStorage.setItem('whatsappLinks', JSON.stringify(whatsappLinks));
+            localStorage.setItem('message', document.getElementById('messageInput').value);
+            localStorage.setItem('rawNumbers', document.getElementById('numberInput').value);
+        }
+
+        function loadState() {
+            if (localStorage.getItem('whatsappLinks')) {
+                currentLinkIndex = parseInt(localStorage.getItem('currentLinkIndex'), 10);
+                whatsappLinks = JSON.parse(localStorage.getItem('whatsappLinks'));
+                document.getElementById('messageInput').value = localStorage.getItem('message');
+                document.getElementById('numberInput').value = localStorage.getItem('rawNumbers');
+                if (whatsappLinks.length > 0) {
+                    updateLink();
+                }
+            }
+        }
+
+        async function generateLinks() {
             currentLinkIndex = 0;
-            var message = document.getElementById('messageInput').value;
-            var rawNumbers = document.getElementById('numberInput').value;
-            var numbers = rawNumbers.split(/[\s,]+/);
-            var linksContainer = document.getElementById('linksContainer');
+            let message = document.getElementById('messageInput').value;
+            let rawNumbers = document.getElementById('numberInput').value;
+            let numbers = rawNumbers.split(/[\s,]+/);
+            let linksContainer = document.getElementById('linksContainer');
+            let spinner = document.getElementById('loadingSpinner');
+            let generateButton = document.querySelector('button[onclick="generateLinks()"]');
             linksContainer.innerHTML = '';
             whatsappLinks = [];
+            linkElement = null; // Reset linkElement to allow it to be recreated
 
-            numbers.forEach(function(rawNumber) {
-                var number = rawNumber.replace(/[^\d]/g, '');
-                if (number.startsWith('972')) {
-                    number = number;
-                } else if (number.startsWith('0')) {
-                    number = '972' + number.substring(1);
-                }
-                if(number) {
-                    var link = 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
-                    whatsappLinks.push(link);
-                }
-            });
+            try {
+                generateButton.disabled = true;
+                spinner.style.display = 'block';
 
-            if(whatsappLinks.length > 0) {
-                updateLink();
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                numbers.forEach(function(rawNumber) {
+                    let number = rawNumber.replace(/[^\d]/g, '');
+                    if (number.startsWith('972')) {
+                        number = number;
+                    } else if (number.startsWith('0')) {
+                        number = '972' + number.substring(1);
+                    }
+                    if (number) {
+                        let link = 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
+                        whatsappLinks.push(link);
+                    }
+                });
+
+                if (whatsappLinks.length > 0) {
+                    updateLink();
+                }
+                saveState();
+            } catch (error) {
+                console.error('An error occurred:', error);
+                alert('אירעה שגיאה במהלך יצירת הקישורים. אנא נסה שוב.');
+            } finally {
+                spinner.style.display = 'none';
+                generateButton.disabled = false;
             }
         }
 
         function updateLink() {
-            var linksContainer = document.getElementById('linksContainer');
+            let linksContainer = document.getElementById('linksContainer');
             if (currentLinkIndex < whatsappLinks.length) {
-                var linkElement = document.createElement('a');
+                if (!linkElement) {
+                    linkElement = document.createElement('a');
+                    linksContainer.appendChild(linkElement);
+                }
+                linkElement.style.display = 'block';
                 linkElement.href = whatsappLinks[currentLinkIndex];
                 linkElement.target = '_blank';
                 linkElement.textContent = 'לחץ כאן להודעת ווצאפ הבאה (' + (currentLinkIndex + 1) + '/' + whatsappLinks.length + ')';
                 linkElement.onclick = function() {
                     currentLinkIndex++;
                     updateLink();
+                    saveState();
                 };
-                linksContainer.innerHTML = '';
-                linksContainer.appendChild(linkElement);
             } else {
                 linksContainer.innerHTML = 'כל הקישורים נבדקו';
+                linkElement = null; // Hide the link element when all links are used
             }
         }
 
+        function showHelp() {
+            alert('כדי להשתמש בכלי זה:\n1. הכנס את ההודעה שברצונך לשלוח.\n2. הכנס את מספרי הטלפון אליהם תרצה לשלוח את ההודעה (מופרדים ברווח, פסיק או שורה חדשה).\n3. לחץ על הכפתור "צור קישורים" כדי ליצור קישורים להודעות ווצאפ לכל המספרים שהכנסת.');
+        }
+
         window.onload = function() {
-            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            loadState();
+            let userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
             if (/iPhone/i.test(userAgent)) {
-                var message = "";
+                let message = "";
 
                 if (/Safari/i.test(userAgent) && !/CriOS/i.test(userAgent)) {
                     message = "כדי לשמור את האפליקציה על מסך הבית, יש ללחוץ על הסמל למטה ולאחר מכן ללחוץ על 'שמור על המסך הבית'";
                 } else {
                     message = "כדי לשמור את האתר כאפליקציה על מסך הבית, עליך לעבור לגלישה באתר מדפדפן הספארי ולהוסיף אותו למסך הבית";
                 }
-                alert(message);
+                let notification = document.getElementById('notification');
+                notification.textContent = message;
             }
+
+            document.getElementById('helpButton').addEventListener('click', showHelp);
         };
     </script>
 </head>
 <body>
-    <h1>יוצר הודעות אוטומטיות לווצאפ</h1>
-    <textarea id="messageInput" placeholder="הכנס את הודעתך כאן"></textarea>
-    <textarea id="numberInput" placeholder="הכנס מספרי טלפון (מופרדים ברווח, פסיק או שורה חדשה)"></textarea>
-    <button onclick="generateLinks()">צור קישורים</button>
-    <div id="linksContainer"></div>
-    <p>נוצר על ידי Afek Banyas</p>
+    <div class="card">
+        <h1>יוצר הודעות אוטומטיות לווצאפ</h1>
+        <p>כלי זה מאפשר לכם ליצור קישורים להודעות ווצאפ בצורה פשוטה ונוחה, ולהפיץ אותם לכל המספרים הדרושים בלחיצת כפתור.</p>
+        <label for="messageInput">הודעה:</label>
+        <textarea id="messageInput" class="form-control" placeholder="הכנס את הודעתך כאן"></textarea>
+        <label for="numberInput">מספרי טלפון:</label>
+        <textarea id="numberInput" class="form-control" placeholder="הכנס מספרי טלפון (מופרדים ברווח, פסיק או שורה חדשה)"></textarea>
+        <button class="btn btn-success btn-lg mt-3" onclick="generateLinks()">
+            <i class="fas fa-link"></i> צור קישורים
+        </button>
+        <div id="loadingSpinner" class="spinner-border text-primary" role="status">
+            <span class="sr-only">אנא המתן...</span>
+        </div>
+        <div id="linksContainer"></div>
+        <p>נוצר על ידי Afek Banyas</p>
+        <div id="notification"></div>
+    </div>
+    <button id="helpButton">?</button>
 </body>
 </html>
